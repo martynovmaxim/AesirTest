@@ -69,5 +69,9 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor)
 	NewTile->OwnerGrid = this;
 	NewTile->SetColor(TileColor);
 	Tiles.Add(NewTile);
+	//spawningBackground
+	AStaticMeshActor* back = GetWorld()->SpawnActor<AStaticMeshActor>(loc - FVector(0, 0, 1), rot, SpawnParams);
+	back->GetStaticMeshComponent()->SetStaticMesh(Background);
+	back->SetMobility(EComponentMobility::Movable);
 	return NewTile;
 }

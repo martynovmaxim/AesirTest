@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <Math/UnrealMathUtility.h>
 #include "HexTile.h"
+#include "Engine/StaticMeshActor.h"
 #include "HexGrid.generated.h"
 
 UCLASS()
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AHexTile> TileBaseClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWRite)
+	UStaticMesh* Background;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GridHeight;

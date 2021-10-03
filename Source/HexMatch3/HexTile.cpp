@@ -16,6 +16,7 @@ AHexTile::AHexTile()
 	
 
 	RootComponent = StaticMesh;
+	RootComponent->SetMobility(EComponentMobility::Movable);
 }
 
 
