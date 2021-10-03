@@ -52,6 +52,8 @@ void AHexGrid::GenerateGrid()
 
 AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
 {
+	//REDO
+
 	y = GridHeight - y - 1;
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
