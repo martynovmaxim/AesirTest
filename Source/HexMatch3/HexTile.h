@@ -41,6 +41,7 @@ public:
 
 	void SetColor(FColor NewColor);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AStaticMeshActor* Background;
 	UMaterialInstanceDynamic* MI_Background;
 

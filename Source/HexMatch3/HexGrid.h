@@ -71,4 +71,6 @@ public:
 
 	void FallTile(AHexTile* tile, int movement);
 
+	void SpawnTile(int x, int y);
+
 };

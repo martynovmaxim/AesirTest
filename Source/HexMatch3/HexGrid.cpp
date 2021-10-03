@@ -101,7 +101,12 @@ void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 				FallTile(tile, movement);
 				
 				//SpawnNewTile
-				
+				int i = line.Num();
+				for (int id : line)
+				{
+					SpawnTile(x, GridHeight - i);
+					i--;
+				}
 			}
 		}
 	}
@@ -124,4 +129,32 @@ void AHexGrid::FallTile(AHexTile* tile, int movement)
 	float y = yOffset * movement;
 	FVector newLoc = FVector(0, y, 0);
 	tile->AddActorWorldOffset(newLoc);
+}
+
+void AHexGrid::SpawnTile(int x, int y)
+{
+	
+	//preparing for spawn
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	UWorld* const World = GetWorld();
+	FRotator rot = FRotator::ZeroRotator;
+	FVector loc = GetActorLocation() + FVector(xOffset * x, yOffset * (GridHeight - y - 1) + yOffset / 2 * (x % 2), 0);
+
+	//new tile init
+	AHexTile* const NewTile = World->SpawnActor<AHexTile>(TileBaseClass, loc, rot, SpawnParams);
+	NewTile->OwnerGrid = this;
+	FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
+	NewTile->SetColor(RandomColor);
+	NewTile->xCoord = x;
+	NewTile->yCoord = y;
+	Tiles.Add(NewTile);
+
+	//Setting Background for the new tile
+	NewTile->Background = Backgrounds[x * 6 + GridHeight - y - 1];
+	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
+	NewTile->MI_Background = MI_Back;
+	NewTile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
 }
