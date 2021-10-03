@@ -37,21 +37,24 @@ void AHexPlayerController::Tick(float DeltaTime)
 			AHexTile* LastHitTile = Cast<AHexTile>(Hit.Actor);
 			if (LastHitTile && LastHitTile != CurrentTile)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tile"));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tile"));
 				if (!CurrentTile || CurrentTile->TileColor == LastHitTile->TileColor)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("NEW TILE"));
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("NEW TILE"));
 					int id = Line.Find(LastHitTile);
 					if (id == -1)
 					{
-						GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("id is %i"), id));
+						LastHitTile->SelectTile(true);
+						//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("id is %i"), id));
 						//need to be added to a row
 						Line.Add(LastHitTile);
 						
 					}
 					else
 					{
+						
 						//went back to previous
+						CurrentTile->SelectTile(false);
 						id = Line.Find(CurrentTile);
 						Line.RemoveAt(id);
 					}
@@ -90,11 +93,19 @@ void AHexPlayerController::Released()
 
 			//Clean
 			Grid->Tiles.Remove(elem);
+			elem->SelectTile(false);
 			//Grid->TilesAdresses.Remove(TPair<int, int> (elem->xCoord, elem->yCoord));
 			elem->Destroy();
 		}
 		Grid->StartFalling(Highest, Lowest);
 		// Tell to Grid to start Gravity and spawning
+	}
+	else
+	{
+		for (auto& tile : Line)
+		{
+			tile->SelectTile(false);
+		}
 	}
 	Line.Empty();
 	CurrentTile = nullptr;

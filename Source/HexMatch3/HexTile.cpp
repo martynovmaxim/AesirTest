@@ -41,3 +41,9 @@ void AHexTile::SetColor(FColor NewColor)
 	MI_Color->SetVectorParameterValue(FName(TEXT("Color")), TileColor);
 }
 
+void AHexTile::SelectTile(bool select)
+{
+	if (select) MI_Background->SetVectorParameterValue(FName(TEXT("Color")), FColor::Yellow);
+	else MI_Background->SetVectorParameterValue(FName(TEXT("Color")), FColor::Silver);
+}
+

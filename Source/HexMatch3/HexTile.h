@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-//#include "HexGrid.h"
+#include "Engine/StaticMeshActor.h"
 #include "HexTile.generated.h"
 
 
@@ -41,11 +41,14 @@ public:
 
 	void SetColor(FColor NewColor);
 
-	
+	AStaticMeshActor* Background;
+	UMaterialInstanceDynamic* MI_Background;
 
 	class AHexGrid* OwnerGrid;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void SelectTile(bool select);
 
 };

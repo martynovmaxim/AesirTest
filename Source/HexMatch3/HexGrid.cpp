@@ -32,9 +32,6 @@ void AHexGrid::Tick(float DeltaTime)
 
 void AHexGrid::GenerateGrid()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Screen Message"));
-	//UE_LOG(Text(LogTemp, Warning, "Hi there!"));
-	float z = this->GetActorLocation().Z;
 	float x = 0;
 	float y = 0;
 	
@@ -44,10 +41,10 @@ void AHexGrid::GenerateGrid()
 		{
 			y = yOffset * j + yOffset / 2 * (i % 2);
 			x = xOffset * i;
-			FVector SpawnLocation = FVector(x, y, z) + GetActorLocation();
-			
+			FVector SpawnLocation = FVector(x, y, 0) + GetActorLocation();
+
+			//SettingColor
 			FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
-			
 			GenerateTile(SpawnLocation, RandomColor, i, j);
 		}
 	}
@@ -69,12 +66,16 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
 	NewTile->xCoord = x;
 	NewTile->yCoord = y;
 	Tiles.Add(NewTile);
-	TilesAdresses.Add(TTuple<int, int>(x, y), NewTile);
 
 	//spawningBackground
 	AStaticMeshActor* back = GetWorld()->SpawnActor<AStaticMeshActor>(loc - FVector(0, 0, 1), rot, SpawnParams);
-	back->GetStaticMeshComponent()->SetStaticMesh(Background);
+	back->GetStaticMeshComponent()->SetStaticMesh(BackgroundMesh);
 	back->SetMobility(EComponentMobility::Movable);
+	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
+	back->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
+	NewTile->Background = back;
+	NewTile->MI_Background = MI_Back;
+	Backgrounds.Add(back);
 	return NewTile;
 }
 
@@ -99,26 +100,20 @@ void AHexGrid::FallLine(int Row, int From, int HowMuch)
 	{
 		int TileX = tile->xCoord;
 		int TileY = tile->yCoord;
-		if (TileX == Row)
-		{
-			if (TileY >= From + HowMuch)
-			{
-				tilesToMove.Add(tile);
-			}
-		}
+		if (TileX == Row && TileY >= From) tilesToMove.Add(tile);
 	}
 	for (auto& tile : tilesToMove)
 	{
 		//change coordinates
-		TPair<int, int> oldAdress = TPair<int, int>(tile->xCoord, tile->yCoord);
 		tile->yCoord -= HowMuch;
-		//update adress lizst
-		//TilesAdresses.FindAndRemoveChecked(oldAdress);
-		//const TPair<int, int> newCoordinates = TPair<int, int>(Row, tile->yCoord);
-		//TilesAdresses.Add(newCoordinates, tile);
+		
+		//Updating Background
+		tile->Background = Backgrounds[tile->xCoord * 6 +GridHeight - tile->yCoord - 1];
+		UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
+		tile->MI_Background = MI_Back;
+		tile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
 
 		//Updating Location
-		FVector oldLoc = tile->GetActorLocation();
 		float y = yOffset * HowMuch;
 		FVector newLoc = FVector(0, y, 0);
 		tile->AddActorWorldOffset(newLoc);

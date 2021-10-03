@@ -31,7 +31,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray <AHexTile*> Tiles;
-	TMap<TPair<int, int>, AHexTile*> TilesAdresses;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray <FColor> TileInfos;
@@ -39,8 +38,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AHexTile> TileBaseClass;
 
+	//BackGround
 	UPROPERTY(EditAnywhere, BlueprintReadWRite)
-	UStaticMesh* Background;
+	UStaticMesh* BackgroundMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWRite)
+	UMaterial* BackgroundMeshMaterial;
+	TArray <AStaticMeshActor*> Backgrounds;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GridHeight;
