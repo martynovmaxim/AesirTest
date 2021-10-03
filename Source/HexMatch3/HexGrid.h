@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <Math/UnrealMathUtility.h>
 #include "HexTile.h"
+#include "Background.h"
 #include "Engine/StaticMeshActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "HexGrid.generated.h"
@@ -25,10 +26,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
-
 public:	
 
+	//Tiles
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray <AHexTile*> Tiles;
 
@@ -41,10 +41,10 @@ public:
 	//BackGround
 	UPROPERTY(EditAnywhere, BlueprintReadWRite)
 	UStaticMesh* BackgroundMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ABackground> BackgroundClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWRite)
-	UMaterial* BackgroundMeshMaterial;
-	TArray <AStaticMeshActor*> Backgrounds;
+	TArray <ABackground*> Backgrounds;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

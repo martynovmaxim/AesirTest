@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Engine/StaticMeshActor.h"
+#include "Background.h"
 #include "HexTile.generated.h"
 
 
@@ -42,8 +42,7 @@ public:
 	void SetColor(FColor NewColor);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AStaticMeshActor* Background;
-	UMaterialInstanceDynamic* MI_Background;
+	ABackground* Background;
 
 	class AHexGrid* OwnerGrid;
 

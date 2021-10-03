@@ -68,13 +68,8 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
 	Tiles.Add(NewTile);
 
 	//spawningBackground
-	AStaticMeshActor* back = GetWorld()->SpawnActor<AStaticMeshActor>(loc - FVector(0, 0, 1), rot, SpawnParams);
-	back->GetStaticMeshComponent()->SetStaticMesh(BackgroundMesh);
-	back->SetMobility(EComponentMobility::Movable);
-	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
-	back->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
+	ABackground* back = GetWorld()->SpawnActor<ABackground>(BackgroundClass, loc - FVector(0, 0, 1), rot, SpawnParams);
 	NewTile->Background = back;
-	NewTile->MI_Background = MI_Back;
 	Backgrounds.Add(back);
 	return NewTile;
 }
@@ -86,7 +81,9 @@ void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 	{
 		int row = elem.Key;
 		TArray<int> line = elem.Value;
-		for (auto& tile : Tiles)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %d"), RowsToDestroy.Num() * line.Num()));
+		TArray <AHexTile*> CopyTiles = Tiles;
+		for (auto& tile : CopyTiles)
 		{
 			int x = tile->xCoord;
 			int y = tile->yCoord;
@@ -101,13 +98,11 @@ void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 				FallTile(tile, movement);
 				
 				//SpawnNewTile
-				int i = line.Num();
-				for (int id : line)
-				{
-					SpawnTile(x, GridHeight - i);
-					i--;
-				}
 			}
+		}
+		for (int i = GridHeight - line.Num(); i < GridHeight; i++)
+		{
+			SpawnTile(row, i);
 		}
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %i"), Coords.Num()));
@@ -121,9 +116,6 @@ void AHexGrid::FallTile(AHexTile* tile, int movement)
 		
 	//Updating Background
 	tile->Background = Backgrounds[tile->xCoord * 6 + GridHeight - tile->yCoord - 1];
-	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
-	tile->MI_Background = MI_Back;
-	tile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
 
 	//Updating Location
 	float y = yOffset * movement;
@@ -133,7 +125,6 @@ void AHexGrid::FallTile(AHexTile* tile, int movement)
 
 void AHexGrid::SpawnTile(int x, int y)
 {
-	
 	//preparing for spawn
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
@@ -145,6 +136,7 @@ void AHexGrid::SpawnTile(int x, int y)
 
 	//new tile init
 	AHexTile* const NewTile = World->SpawnActor<AHexTile>(TileBaseClass, loc, rot, SpawnParams);
+	UE_LOG(LogTemp, Warning, TEXT("Spawned %s, row %d, id %d"), *NewTile->GetName(), x, y);
 	NewTile->OwnerGrid = this;
 	FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
 	NewTile->SetColor(RandomColor);
@@ -154,7 +146,4 @@ void AHexGrid::SpawnTile(int x, int y)
 
 	//Setting Background for the new tile
 	NewTile->Background = Backgrounds[x * 6 + GridHeight - y - 1];
-	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
-	NewTile->MI_Background = MI_Back;
-	NewTile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
 }

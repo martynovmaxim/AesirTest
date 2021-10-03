@@ -21,7 +21,7 @@ void AHexPlayerController::SetupInputComponent()
 
 void AHexPlayerController::BeginPlay()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("play"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("play"));
 	
 }
 
@@ -33,35 +33,29 @@ void AHexPlayerController::Tick(float DeltaTime)
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 		if (Hit.bBlockingHit)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Hit %s"), *Hit.Actor->GetName()));
 			//check if this is the same color as we already hit and the same
 			AHexTile* LastHitTile = Cast<AHexTile>(Hit.Actor);
 			if (LastHitTile && LastHitTile != CurrentTile)
 			{
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Tile"));
 				if (!CurrentTile || CurrentTile->TileColor == LastHitTile->TileColor)
 				{
-					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("NEW TILE"));
 					int id = Line.Find(LastHitTile);
 					if (id == -1)
 					{
 						LastHitTile->SelectTile(true);
-						//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, FString::Printf(TEXT("id is %i"), id));
 						//need to be added to a row
 						Line.Add(LastHitTile);
-						
 					}
 					else
 					{
-						
 						//went back to previous
 						CurrentTile->SelectTile(false);
 						id = Line.Find(CurrentTile);
 						Line.RemoveAt(id);
 					}
 					CurrentTile = LastHitTile;
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Len is %i"), Line.Num()));
 				}
-
 			}
 		}
 	}
@@ -70,13 +64,11 @@ void AHexPlayerController::Tick(float DeltaTime)
 
 void AHexPlayerController::Clicked()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("click"));
 	HasClicked = true;
 }
 
 void AHexPlayerController::Released()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Release"));
 	if (Line.Num() >= 3)
 	{
 		TMap <int, TArray<int>> RowsToDestroy;
@@ -89,7 +81,6 @@ void AHexPlayerController::Released()
 			//Clean
 			Grid->Tiles.Remove(elem);
 			elem->SelectTile(false);
-			//Grid->TilesAdresses.Remove(TPair<int, int> (elem->xCoord, elem->yCoord));
 			elem->Destroy();
 		}
 		Grid->StartFalling(RowsToDestroy);

@@ -26,6 +26,8 @@ void AHexTile::BeginPlay()
 	Super::BeginPlay();
 	MI_Color = UMaterialInstanceDynamic::Create(TileMaterial, this);
 	StaticMesh->SetMaterial(0, MI_Color);
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Spawned %s"), *GetName()));
+	//UE_LOG(LogTemp, Warning, TEXT("Spawned %s, row %d, id %d"), *GetName(), xCoord, yCoord);
 }
 
 // Called every frame
@@ -43,7 +45,6 @@ void AHexTile::SetColor(FColor NewColor)
 
 void AHexTile::SelectTile(bool select)
 {
-	if (select) MI_Background->SetVectorParameterValue(FName(TEXT("Color")), FColor::Yellow);
-	else MI_Background->SetVectorParameterValue(FName(TEXT("Color")), FColor::Silver);
+	Background->Activate(select);
 }
 
