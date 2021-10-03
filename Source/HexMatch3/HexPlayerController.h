@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HexTile.h"
 #include "HexGrid.h"
+#include "Containers/Map.h"
 #include "HexPlayerController.generated.h"
 
 /**
@@ -29,6 +30,7 @@ public:
 	void Released();
 	bool HasClicked = false;
 
+	class AHexGrid* Grid;
 
 	TArray<AHexTile*> Line;
 	AHexTile* CurrentTile;

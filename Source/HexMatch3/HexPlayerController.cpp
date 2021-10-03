@@ -68,22 +68,30 @@ void AHexPlayerController::Tick(float DeltaTime)
 void AHexPlayerController::Clicked()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("click"));
-	//PrimaryActorTick.bCanEverTick = true;
 	HasClicked = true;
-	/*FHitResult Hit;
-	GetHitResultUnderCursor*/
 }
 
 void AHexPlayerController::Released()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Release"));
-	//PrimaryActorTick.bCanEverTick = false;
 	if (Line.Num() >= 3)
 	{
+		TMap <int, int> Highest;
+		TMap <int, int> Lowest;
 		for (int i = 0; i < Line.Num(); i++)
 		{
+			auto elem = Line[i];
+
+			if (!Lowest.Contains(elem->xCoord)) Lowest.Add(elem->xCoord, elem->yCoord);
+			else if(elem->yCoord < Lowest[elem->xCoord]) Lowest.Add(elem->xCoord, elem->yCoord);
+
+			if (!Highest.Contains(elem->xCoord)) Highest.Add(elem->xCoord, elem->yCoord);
+			else if (elem->yCoord > Highest[elem->xCoord]) Highest.Add(elem->xCoord, elem->yCoord);
+
 			Line[i]->Destroy();
 		}
+		Grid->StartFalling(Highest, Lowest);
+		// Tell to Grid to start Gravity and spawning
 	}
 	Line.Empty();
 	CurrentTile = nullptr;

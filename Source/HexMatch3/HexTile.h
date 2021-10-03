@@ -34,6 +34,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor TileColor;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int xCoord;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int yCoord;
+
 	void SetColor(FColor NewColor);
 
 	

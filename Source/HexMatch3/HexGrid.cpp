@@ -2,6 +2,7 @@
 
 
 #include "HexGrid.h"
+#include "HexPlayerController.h"
 
 // Sets default values
 AHexGrid::AHexGrid()
@@ -16,6 +17,8 @@ AHexGrid::AHexGrid()
 void AHexGrid::BeginPlay()
 {
 	Super::BeginPlay();
+	Cast<AHexPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0))->Grid = this;
+
 	GenerateGrid();
 	
 }
@@ -33,12 +36,10 @@ void AHexGrid::GenerateGrid()
 	//UE_LOG(Text(LogTemp, Warning, "Hi there!"));
 	float z = this->GetActorLocation().Z;
 	float x = 0;
-	float xOffset = 15.5;
 	float y = 0;
-	float yOffset = 18;
+	
 	for (int i = 0; i < GridWidth; i++)
 	{
-		
 		for (int j = 0; j < GridHeight; j++)
 		{
 			y = yOffset * j + yOffset / 2 * (i % 2);
@@ -47,24 +48,29 @@ void AHexGrid::GenerateGrid()
 			
 			FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
 			
-			GenerateTile(SpawnLocation, RandomColor);
+			GenerateTile(SpawnLocation, RandomColor, i, j);
 		}
 	}
 }
 
-AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor)
+AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
 {
-	//ignoring for now randomising the Color
+	y = GridHeight - y - 1;
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	UWorld* const World = GetWorld();
 	FRotator rot = FRotator::ZeroRotator;
+
 	AHexTile* const NewTile = World->SpawnActor<AHexTile>(TileBaseClass, loc, rot, SpawnParams);
 	NewTile->OwnerGrid = this;
 	NewTile->SetColor(TileColor);
+	NewTile->xCoord = x;
+	NewTile->yCoord = y;
 	Tiles.Add(NewTile);
+	TilesAdresses.Add(TTuple<int, int>(x, y), NewTile);
+
 	//spawningBackground
 	AStaticMeshActor* back = GetWorld()->SpawnActor<AStaticMeshActor>(loc - FVector(0, 0, 1), rot, SpawnParams);
 	back->GetStaticMeshComponent()->SetStaticMesh(Background);
@@ -72,7 +78,49 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor)
 	return NewTile;
 }
 
-void AHexGrid::StartFalling()
+void AHexGrid::StartFalling(TMap <int, int> Highest, TMap <int, int> Lowest)
 {
+	//find Highest and lowest in each Row
+	for (auto& elem : Lowest)
+	{
+		//clamping from 1 to inf
+		int32 max = Highest[elem.Key];
+		int count = max - elem.Value + 1;
+		FallLine(elem.Key, elem.Value, count);
+	}
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %i"), Coords.Num()));
+}
 
+void AHexGrid::FallLine(int Row, int From, int HowMuch)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), Row, From, HowMuch));
+	TArray<AHexTile*> tilesToMove;
+	for (auto& coords : TilesAdresses)
+	{
+		int TileX = coords.Key.Key;
+		int TileY = coords.Key.Value;
+		if (TileX == Row)
+		{
+			if (TileY >= From + HowMuch)
+			{
+				tilesToMove.Add(coords.Value);
+			}
+		}
+	}
+	for (auto& tile : tilesToMove)
+	{
+		//change coordinates
+		tile->yCoord -= HowMuch;
+		//update adress list
+		const TPair<int, int>* oldCoordinates = TilesAdresses.FindKey(tile);
+		TilesAdresses.FindAndRemoveChecked(*oldCoordinates);
+		const TPair<int, int> newCoordinates = TPair<int, int>(Row, tile->yCoord);
+		TilesAdresses.Add(newCoordinates, tile);
+
+		//Updating Location
+		FVector oldLoc = tile->GetActorLocation();
+		float y = yOffset * tile->yCoord + yOffset / 2 * (tile->xCoord % 2);
+		FVector newLoc = FVector(oldLoc.X, y, oldLoc.Z);
+		tile->SetActorLocation(newLoc);
+	}
 }
