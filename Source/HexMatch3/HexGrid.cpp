@@ -79,43 +79,49 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
 	return NewTile;
 }
 
-void AHexGrid::StartFalling(TMap <int, int> Highest, TMap <int, int> Lowest)
+void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 {
 	//find Highest and lowest in each Row
-	for (auto& elem : Lowest)
+	for (auto& elem :RowsToDestroy)
 	{
-		//clamping from 1 to inf
-		int32 max = Highest[elem.Key];
-		int count = max - elem.Value + 1;
-		FallLine(elem.Key, elem.Value, count);
+		int row = elem.Key;
+		TArray<int> line = elem.Value;
+		for (auto& tile : Tiles)
+		{
+			int x = tile->xCoord;
+			int y = tile->yCoord;
+			if (x == row)
+			{
+				//calculate movement
+				int movement = 0;
+				for (int id : line)
+				{
+					if (y > id) movement++;
+				}
+				FallTile(tile, movement);
+				
+				//SpawnNewTile
+				
+			}
+		}
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %i"), Coords.Num()));
 }
 
-void AHexGrid::FallLine(int Row, int From, int HowMuch)
+void AHexGrid::FallTile(AHexTile* tile, int movement)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), Row, From, HowMuch));
-	TArray<AHexTile*> tilesToMove;
-	for (auto& tile : Tiles)
-	{
-		int TileX = tile->xCoord;
-		int TileY = tile->yCoord;
-		if (TileX == Row && TileY >= From) tilesToMove.Add(tile);
-	}
-	for (auto& tile : tilesToMove)
-	{
-		//change coordinates
-		tile->yCoord -= HowMuch;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), ));
+	//change coordinates
+	tile->yCoord -= movement;
 		
-		//Updating Background
-		tile->Background = Backgrounds[tile->xCoord * 6 +GridHeight - tile->yCoord - 1];
-		UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
-		tile->MI_Background = MI_Back;
-		tile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
+	//Updating Background
+	tile->Background = Backgrounds[tile->xCoord * 6 + GridHeight - tile->yCoord - 1];
+	UMaterialInstanceDynamic* MI_Back = UMaterialInstanceDynamic::Create(BackgroundMeshMaterial, this);
+	tile->MI_Background = MI_Back;
+	tile->Background->GetStaticMeshComponent()->SetMaterial(0, MI_Back);
 
-		//Updating Location
-		float y = yOffset * HowMuch;
-		FVector newLoc = FVector(0, y, 0);
-		tile->AddActorWorldOffset(newLoc);
-	}
+	//Updating Location
+	float y = yOffset * movement;
+	FVector newLoc = FVector(0, y, 0);
+	tile->AddActorWorldOffset(newLoc);
 }

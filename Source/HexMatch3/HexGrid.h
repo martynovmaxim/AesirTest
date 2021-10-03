@@ -67,8 +67,8 @@ public:
 
 	void StartGravity();
 
-	void StartFalling(TMap <int, int> Highest, TMap <int, int> Lowest);
+	void StartFalling(TMap <int, TArray<int>> RowsToDestroy);
 
-	void FallLine(int Row, int From, int HowMuch);
+	void FallTile(AHexTile* tile, int movement);
 
 };
