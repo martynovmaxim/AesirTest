@@ -54,4 +54,6 @@ public:
 
 	AHexTile* GenerateTile(FVector loc, FColor TileColor);
 
+	void StartFalling();
+
 };

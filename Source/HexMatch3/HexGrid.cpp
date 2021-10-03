@@ -33,18 +33,14 @@ void AHexGrid::GenerateGrid()
 	//UE_LOG(Text(LogTemp, Warning, "Hi there!"));
 	float z = this->GetActorLocation().Z;
 	float x = 0;
-	float xOffset = 14.75;
+	float xOffset = 15.5;
 	float y = 0;
-	float yOffset = 17.3;
+	float yOffset = 18;
 	for (int i = 0; i < GridWidth; i++)
 	{
 		
 		for (int j = 0; j < GridHeight; j++)
 		{
-			//SomeSpawningMagic; boundaries of the static mesh with 0.1 scale is (20, 17.3);
-			/*FVector Boundaries = FVector(20, 17.3, 0);
-			x = Boundaries.X * i + (0.45/2) * (j % 2);
-			y = Boundaries.Y * j;*/
 			y = yOffset * j + yOffset / 2 * (i % 2);
 			x = xOffset * i;
 			FVector SpawnLocation = FVector(x, y, z) + GetActorLocation();
@@ -74,4 +70,9 @@ AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor)
 	back->GetStaticMeshComponent()->SetStaticMesh(Background);
 	back->SetMobility(EComponentMobility::Movable);
 	return NewTile;
+}
+
+void AHexGrid::StartFalling()
+{
+
 }

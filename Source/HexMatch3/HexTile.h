@@ -36,7 +36,7 @@ public:
 
 	void SetColor(FColor NewColor);
 
-	void OnClicked();
+	
 
 	class AHexGrid* OwnerGrid;
 
