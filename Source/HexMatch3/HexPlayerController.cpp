@@ -90,7 +90,7 @@ void AHexPlayerController::Released()
 
 			//Clean
 			Grid->Tiles.Remove(elem);
-			Grid->TilesAdresses.Remove(TPair<int, int> (elem->xCoord, elem->yCoord));
+			//Grid->TilesAdresses.Remove(TPair<int, int> (elem->xCoord, elem->yCoord));
 			elem->Destroy();
 		}
 		Grid->StartFalling(Highest, Lowest);
