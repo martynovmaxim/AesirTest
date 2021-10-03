@@ -88,7 +88,10 @@ void AHexPlayerController::Released()
 			if (!Highest.Contains(elem->xCoord)) Highest.Add(elem->xCoord, elem->yCoord);
 			else if (elem->yCoord > Highest[elem->xCoord]) Highest.Add(elem->xCoord, elem->yCoord);
 
-			Line[i]->Destroy();
+			//Clean
+			Grid->Tiles.Remove(elem);
+			Grid->TilesAdresses.Remove(TPair<int, int> (elem->xCoord, elem->yCoord));
+			elem->Destroy();
 		}
 		Grid->StartFalling(Highest, Lowest);
 		// Tell to Grid to start Gravity and spawning

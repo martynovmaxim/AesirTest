@@ -93,7 +93,7 @@ void AHexGrid::StartFalling(TMap <int, int> Highest, TMap <int, int> Lowest)
 
 void AHexGrid::FallLine(int Row, int From, int HowMuch)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), Row, From, HowMuch));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), Row, From, HowMuch));
 	TArray<AHexTile*> tilesToMove;
 	for (auto& coords : TilesAdresses)
 	{
@@ -110,17 +110,17 @@ void AHexGrid::FallLine(int Row, int From, int HowMuch)
 	for (auto& tile : tilesToMove)
 	{
 		//change coordinates
+		TPair<int, int> oldAdress = TPair<int, int>(tile->xCoord, tile->yCoord);
 		tile->yCoord -= HowMuch;
 		//update adress list
-		const TPair<int, int>* oldCoordinates = TilesAdresses.FindKey(tile);
-		TilesAdresses.FindAndRemoveChecked(*oldCoordinates);
+		TilesAdresses.FindAndRemoveChecked(oldAdress);
 		const TPair<int, int> newCoordinates = TPair<int, int>(Row, tile->yCoord);
 		TilesAdresses.Add(newCoordinates, tile);
 
 		//Updating Location
 		FVector oldLoc = tile->GetActorLocation();
-		float y = yOffset * tile->yCoord + yOffset / 2 * (tile->xCoord % 2);
-		FVector newLoc = FVector(oldLoc.X, y, oldLoc.Z);
-		tile->SetActorLocation(newLoc);
+		float y = yOffset * HowMuch;
+		FVector newLoc = FVector(0, y, 0);
+		tile->AddActorWorldOffset(newLoc);
 	}
 }
