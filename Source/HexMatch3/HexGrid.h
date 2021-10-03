@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <Math/UnrealMathUtility.h>
 #include "HexTile.h"
 #include "HexGrid.generated.h"
 
@@ -31,16 +32,22 @@ public:
 	TArray <FColor> TileInfos;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AHexTile> TileBaseClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GridHeight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GridWidth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float GapWidth;
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void GenerateGrid();
 
-	AHexTile* GenerateTile();
+	AHexTile* GenerateTile(FVector loc, FColor TileColor);
 
 };

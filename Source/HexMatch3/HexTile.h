@@ -29,9 +29,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMaterial* TileMaterial;
+	UMaterialInstanceDynamic* MI_Color;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FColor TileColor;
+
+	void SetColor(FColor NewColor);
+
+	
 
 	class AHexGrid* OwnerGrid;
 
