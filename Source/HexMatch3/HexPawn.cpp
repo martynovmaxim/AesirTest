@@ -14,8 +14,6 @@ AHexPawn::AHexPawn()
 	HexCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 	HexCamera->SetOrthoWidth(300);
 	bUseControllerRotationPitch = true;
-	//bUseControllerRotationRoll = true;
-	//bUseControllerRotationYaw = true;
 }
 
 // Called when the game starts or when spawned
@@ -37,8 +35,5 @@ void AHexPawn::Tick(float DeltaTime)
 void AHexPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-
-
 }
 

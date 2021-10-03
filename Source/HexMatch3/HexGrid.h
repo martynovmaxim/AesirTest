@@ -63,14 +63,10 @@ public:
 
 	void GenerateGrid();
 
-	AHexTile* GenerateTile(FVector loc, FColor TileColor, int _xCoord, int _yCoord);
-
-	void StartGravity();
-
 	void StartFalling(TMap <int, TArray<int>> RowsToDestroy);
 
 	void FallTile(AHexTile* tile, int movement);
 
-	void SpawnTile(int x, int y);
+	AHexTile* SpawnTile(int x, int y);
 
 };

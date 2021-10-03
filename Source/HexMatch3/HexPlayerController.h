@@ -9,9 +9,8 @@
 #include "Containers/Map.h"
 #include "HexPlayerController.generated.h"
 
-/**
- * 
- */
+class AHexGrid;
+
 UCLASS()
 class HEXMATCH3_API AHexPlayerController : public APlayerController
 {
@@ -26,14 +25,17 @@ public:
 
 	virtual void SetupInputComponent() override;
 
+	//EventForMouseClick
 	void Clicked();
+
+	//EventForMouseClick
 	void Released();
-	bool HasClicked = false;
-
-	class AHexGrid* Grid;
-
-	TArray<AHexTile*> Line;
+	
+	AHexGrid* Grid;
+	
+private:
 	AHexTile* CurrentTile;
-
+	TArray<AHexTile*> Line;
+	bool HasClicked = false;
 	
 };

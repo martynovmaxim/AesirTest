@@ -26,8 +26,6 @@ void AHexTile::BeginPlay()
 	Super::BeginPlay();
 	MI_Color = UMaterialInstanceDynamic::Create(TileMaterial, this);
 	StaticMesh->SetMaterial(0, MI_Color);
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Spawned %s"), *GetName()));
-	//UE_LOG(LogTemp, Warning, TEXT("Spawned %s, row %d, id %d"), *GetName(), xCoord, yCoord);
 }
 
 // Called every frame

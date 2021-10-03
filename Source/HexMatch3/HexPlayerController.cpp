@@ -7,7 +7,6 @@ AHexPlayerController::AHexPlayerController()
 {
 	bEnableClickEvents = true;
 	bShowMouseCursor = true;
-	//PrimaryActorTick.bCanEverTick = false;
 }
 
 void AHexPlayerController::SetupInputComponent()
@@ -21,8 +20,7 @@ void AHexPlayerController::SetupInputComponent()
 
 void AHexPlayerController::BeginPlay()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("play"));
-	
+
 }
 
 void AHexPlayerController::Tick(float DeltaTime)
@@ -33,8 +31,7 @@ void AHexPlayerController::Tick(float DeltaTime)
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 		if (Hit.bBlockingHit)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Hit %s"), *Hit.Actor->GetName()));
-			//check if this is the same color as we already hit and the same
+			//Check if this is the same color as we already hit and the same
 			AHexTile* LastHitTile = Cast<AHexTile>(Hit.Actor);
 			if (LastHitTile && LastHitTile != CurrentTile)
 			{
@@ -47,9 +44,9 @@ void AHexPlayerController::Tick(float DeltaTime)
 						//need to be added to a row
 						Line.Add(LastHitTile);
 					}
+					//went back to previous
 					else
 					{
-						//went back to previous
 						CurrentTile->SelectTile(false);
 						id = Line.Find(CurrentTile);
 						Line.RemoveAt(id);
@@ -72,19 +69,18 @@ void AHexPlayerController::Released()
 	if (Line.Num() >= 3)
 	{
 		TMap <int, TArray<int>> RowsToDestroy;
-		for (int i = 0; i < Line.Num(); i++)
+		for (auto& elem : Line)
 		{
-			auto elem = Line[i];
-
-			if (!RowsToDestroy.Contains(elem->xCoord)) RowsToDestroy.Add(elem->xCoord);
-			RowsToDestroy[elem->xCoord].Add(elem->yCoord);
+			int x = elem->xCoord;
+			int y = elem->yCoord;
+			if (!RowsToDestroy.Contains(x)) RowsToDestroy.Add(x);
+			RowsToDestroy[x].Add(y);
 			//Clean
 			Grid->Tiles.Remove(elem);
 			elem->SelectTile(false);
 			elem->Destroy();
 		}
 		Grid->StartFalling(RowsToDestroy);
-		// Tell to Grid to start Gravity and spawning
 	}
 	else
 	{

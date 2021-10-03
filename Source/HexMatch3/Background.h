@@ -23,16 +23,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Meshes")
 	UStaticMeshComponent* StaticMesh;
 
 	UMaterialInstanceDynamic* MI_Background;
 
-	void SetColor(FColor NewColor);
-
 	void Activate(bool activate);
 
 	UStaticMeshComponent* GetStaticMeshComponent() { return StaticMesh; }
+
+private:
+	void SetColor(FColor NewColor);
 };
 
 

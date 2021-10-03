@@ -31,49 +31,14 @@ void AHexGrid::Tick(float DeltaTime)
 }
 
 void AHexGrid::GenerateGrid()
-{
-	float x = 0;
-	float y = 0;
-	
+{	
 	for (int i = 0; i < GridWidth; i++)
 	{
-		for (int j = 0; j < GridHeight; j++)
+		for (int j = GridHeight - 1; j >= 0 ; j--)
 		{
-			y = yOffset * j + yOffset / 2 * (i % 2);
-			x = xOffset * i;
-			FVector SpawnLocation = FVector(x, y, 0) + GetActorLocation();
-
-			//SettingColor
-			FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
-			GenerateTile(SpawnLocation, RandomColor, i, j);
+			SpawnTile(i, j);
 		}
 	}
-}
-
-AHexTile* AHexGrid::GenerateTile(FVector loc, FColor TileColor, int x, int y)
-{
-	//REDO
-
-	y = GridHeight - y - 1;
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	UWorld* const World = GetWorld();
-	FRotator rot = FRotator::ZeroRotator;
-
-	AHexTile* const NewTile = World->SpawnActor<AHexTile>(TileBaseClass, loc, rot, SpawnParams);
-	NewTile->OwnerGrid = this;
-	NewTile->SetColor(TileColor);
-	NewTile->xCoord = x;
-	NewTile->yCoord = y;
-	Tiles.Add(NewTile);
-
-	//spawningBackground
-	ABackground* back = GetWorld()->SpawnActor<ABackground>(BackgroundClass, loc - FVector(0, 0, 1), rot, SpawnParams);
-	NewTile->Background = back;
-	Backgrounds.Add(back);
-	return NewTile;
 }
 
 void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
@@ -83,7 +48,6 @@ void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 	{
 		int row = elem.Key;
 		TArray<int> line = elem.Value;
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %d"), RowsToDestroy.Num() * line.Num()));
 		TArray <AHexTile*> CopyTiles = Tiles;
 		for (auto& tile : CopyTiles)
 		{
@@ -98,22 +62,19 @@ void AHexGrid::StartFalling(TMap <int, TArray<int>> RowsToDestroy)
 					if (y > id) movement++;
 				}
 				FallTile(tile, movement);
-				
-				//SpawnNewTile
 			}
 		}
+		//SpawnTiles
 		for (int i = GridHeight - line.Num(); i < GridHeight; i++)
 		{
 			SpawnTile(row, i);
 		}
 	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall is %i"), Coords.Num()));
 }
 
 void AHexGrid::FallTile(AHexTile* tile, int movement)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Fall Line %i from %i howmuch %i"), ));
-	//change coordinates
+	//Change coordinates
 	tile->yCoord -= movement;
 		
 	//Updating Background
@@ -125,7 +86,7 @@ void AHexGrid::FallTile(AHexTile* tile, int movement)
 	tile->AddActorWorldOffset(newLoc);
 }
 
-void AHexGrid::SpawnTile(int x, int y)
+AHexTile* AHexGrid::SpawnTile(int x, int y)
 {
 	//preparing for spawn
 	FActorSpawnParameters SpawnParams;
@@ -138,7 +99,6 @@ void AHexGrid::SpawnTile(int x, int y)
 
 	//new tile init
 	AHexTile* const NewTile = World->SpawnActor<AHexTile>(TileBaseClass, loc, rot, SpawnParams);
-	UE_LOG(LogTemp, Warning, TEXT("Spawned %s, row %d, id %d"), *NewTile->GetName(), x, y);
 	NewTile->OwnerGrid = this;
 	FColor RandomColor = TileInfos[FMath::RandRange(0, TileInfos.Num() - 1)];
 	NewTile->SetColor(RandomColor);
@@ -147,5 +107,13 @@ void AHexGrid::SpawnTile(int x, int y)
 	Tiles.Add(NewTile);
 
 	//Setting Background for the new tile
-	NewTile->Background = Backgrounds[x * 6 + GridHeight - y - 1];
+	if (Backgrounds.Num() < GridHeight * GridWidth)
+	{
+		ABackground* back = GetWorld()->SpawnActor<ABackground>(BackgroundClass, loc - FVector(0, 0, 1), rot, SpawnParams);
+		NewTile->Background = back;
+		Backgrounds.Add(back);
+	}
+	else NewTile->Background = Backgrounds[x * 6 + GridHeight - y - 1];
+
+	return NewTile;
 }
